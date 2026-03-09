@@ -96,6 +96,30 @@ const NAV_ITEMS: NavItem[] = [
         badge: 'NEW',
         description: '도서 카탈로그, 대출/반납, 독서 로그',
     },
+    {
+        id: 'epub-reader',
+        label: 'EPUB Reader',
+        labelKo: '원서 읽기',
+        icon: <BookOpen className="h-5 w-5" />,
+        badge: 'NEW',
+        description: 'EPUB 원서 읽기, 하이라이트, 단어장 연동',
+    },
+    {
+        id: 'vocab',
+        label: 'Vocabulary',
+        labelKo: '어휘 복습',
+        icon: <Brain className="h-5 w-5" />,
+        badge: 'NEW',
+        description: 'FSRS 간격 반복 플래시카드 어휘 복습',
+    },
+    {
+        id: 'analytics',
+        label: 'Analytics',
+        labelKo: '학습 분석',
+        icon: <BarChart3 className="h-5 w-5" />,
+        badge: 'NEW',
+        description: '학생별 독서/워크시트/어휘 성과 대시보드',
+    },
 ];
 
 export function DashboardHome({ onNavigate }: { onNavigate: (moduleId: string) => void }) {

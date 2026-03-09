@@ -11,6 +11,9 @@ import { GamificationModule } from '@/components/gamification-module';
 import { MetaQuestionModule } from '@/components/meta-question-module';
 import { LibraryModule } from '@/components/library-module';
 import { SettingsModule } from '@/components/settings-module';
+import { EpubReaderModule } from '@/components/epub-reader-module';
+import { VocabModule } from '@/components/vocab-module';
+import { AnalyticsDashboard } from '@/components/analytics-dashboard';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { useState } from 'react';
 
@@ -43,6 +46,9 @@ export default function Home() {
       case 'meta-questions': return <MetaQuestionModule onBack={back} />;
       case 'library': return <LibraryModule onBack={back} />;
       case 'settings': return <SettingsModule onBack={back} />;
+      case 'epub-reader': return <EpubReaderModule bookUrl="" bookTitle="원서 읽기" onBack={back} />;
+      case 'vocab': return <VocabModule onBack={back} />;
+      case 'analytics': return <AnalyticsDashboard onBack={back} />;
       default: return <DashboardHome onNavigate={setActiveModule} />;
     }
   })();
