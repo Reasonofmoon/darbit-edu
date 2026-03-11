@@ -20,6 +20,41 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Grading Engine
+
+The project now includes an MVP grading engine scaffold for assessment products:
+
+- Shared types: `src/lib/grading-types.ts`
+- Engine registry: `src/lib/grading/engine.ts`
+- Sample graders: `src/lib/grading/graders.ts`
+- Normalizers: `src/lib/grading/normalizers.ts`
+- Schema draft: `docs/grading-engine-schema.md`
+
+Example usage:
+
+```ts
+import { GradingEngine, sampleQuestions } from '@/lib/grading';
+
+const engine = new GradingEngine();
+const result = engine.gradeAssessment(
+  sampleQuestions,
+  {
+    'mc-1': 'B',
+    'tf-1': true,
+    'fib-1': ['spider', 'pig'],
+    'sa-1': 'Fern cared about the small baby pig and did not want people to kill it.',
+    'essay-1': 'Charlotte becomes Wilbur\'s friend and gives him confidence through words in the web.',
+  },
+  {
+    studentId: 'student-1',
+    assessmentId: 'assessment-1',
+    attemptId: 'attempt-1',
+    attemptNumber: 1,
+    submittedAt: new Date().toISOString(),
+  },
+);
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

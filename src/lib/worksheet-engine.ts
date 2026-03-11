@@ -9,6 +9,7 @@ import type {
     ShortAnswerQuestion,
     TrueFalseQuestion,
 } from './firestore-types';
+import { gradeWorksheetWithEngine } from './grading';
 
 export type StudentAnswers = Record<string, string | boolean>;
 
@@ -148,25 +149,7 @@ export function gradeWorksheet(
     timeSec: number,
     studentName: string = '',
 ): Omit<FSWorksheetAttempt, 'id'> {
-    const questionResults = worksheet.questions.map((question) =>
-        gradeQuestion(question, answers[question.id]),
-    );
-    const score = questionResults.reduce((sum, result) => sum + result.earned, 0);
-    const maxScore = questionResults.reduce((sum, result) => sum + result.max, 0);
-    const percentage = maxScore > 0 ? Number(((score / maxScore) * 100).toFixed(1)) : 0;
-
-    return {
-        worksheetId: worksheet.id,
-        studentId,
-        studentName: studentName || studentId,
-        score,
-        maxScore,
-        percentage,
-        grade: toGrade(percentage),
-        questionResults,
-        timeSec,
-        submittedAt: new Date().toISOString(),
-    };
+    return gradeWorksheetWithEngine(worksheet, answers, studentId, timeSec, studentName);
 }
 
 /**

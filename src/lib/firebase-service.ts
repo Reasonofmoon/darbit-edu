@@ -31,6 +31,13 @@ import type {
     FSClass,
     FSUser,
 } from './firestore-types';
+import type {
+    AssessmentGradeResult,
+    AnswerMap,
+    StoredAttemptAnswer,
+    StoredFeedbackItem,
+    StoredGradingResult,
+} from './grading-types';
 
 // ── 유틸 ──────────────────────────────────────────────
 function toISO(val: unknown): string {
@@ -261,6 +268,67 @@ export const worksheetService = {
         );
         const snaps = await getDocs(q);
         return snaps.docs.map(s => ({ ...s.data(), id: s.id } as FSWorksheetAttempt));
+    },
+};
+
+// ── 평가 채점 결과 ───────────────────────────────────
+export const gradingService = {
+    async saveAttemptAnswers(attemptId: string, answers: AnswerMap): Promise<string[]> {
+        const entries = Object.entries(answers);
+        const ids = await Promise.all(entries.map(async ([questionId, rawAnswer]) => {
+            const ref = await addDoc(col('attemptAnswers'), {
+                attemptId,
+                questionId,
+                rawAnswer,
+                normalizedAnswer: rawAnswer,
+                answeredAt: new Date().toISOString(),
+            });
+            return ref.id;
+        }));
+        return ids;
+    },
+
+    async saveAssessmentResult(result: AssessmentGradeResult): Promise<string[]> {
+        const ids = await Promise.all(result.results.map(async (item) => {
+            const ref = await addDoc(col('gradingResults'), {
+                attemptId: result.attemptId,
+                questionId: item.questionId,
+                autoScore: item.earned,
+                finalScore: item.earned,
+                maxScore: item.max,
+                isCorrect: item.isCorrect,
+                confidence: item.confidence,
+                autoGraded: item.autoGraded,
+                requiresTeacherReview: item.requiresTeacherReview,
+                reviewStatus: item.reviewStatus,
+                feedback: item.feedback,
+                feedbackCode: item.feedbackCode,
+                rubricItems: item.rubricItems ?? [],
+                gradedAt: result.submittedAt,
+            });
+            return ref.id;
+        }));
+        return ids;
+    },
+
+    async saveFeedbackItems(items: Omit<StoredFeedbackItem, 'id'>[]): Promise<string[]> {
+        const ids = await Promise.all(items.map(async (item) => {
+            const ref = await addDoc(col('feedbackItems'), item);
+            return ref.id;
+        }));
+        return ids;
+    },
+
+    async listAttemptAnswers(attemptId: string): Promise<StoredAttemptAnswer[]> {
+        const q = query(col('attemptAnswers'), where('attemptId', '==', attemptId), orderBy('answeredAt', 'asc'));
+        const snaps = await getDocs(q);
+        return snaps.docs.map((snap) => ({ ...snap.data(), id: snap.id } as StoredAttemptAnswer));
+    },
+
+    async listGradingResults(attemptId: string): Promise<StoredGradingResult[]> {
+        const q = query(col('gradingResults'), where('attemptId', '==', attemptId), orderBy('gradedAt', 'asc'));
+        const snaps = await getDocs(q);
+        return snaps.docs.map((snap) => ({ ...snap.data(), id: snap.id } as StoredGradingResult));
     },
 };
 
