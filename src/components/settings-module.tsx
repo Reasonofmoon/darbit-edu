@@ -104,9 +104,9 @@ export function SettingsModule({ onBack }: { onBack: () => void }) {
                             <CardHeader className="pb-3"><CardTitle className="text-sm">Multi-LLM API 키</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
                                 {[
-                                    { id: 'gemini', label: 'Google Gemini', desc: '레벨테스트, 워크시트, 메타인지 질문' },
-                                    { id: 'claude', label: 'Anthropic Claude', desc: '수능 문항 분석, 피드백 생성' },
-                                    { id: 'openai', label: 'OpenAI GPT-4o', desc: '부모님 피드백, 학습 추천' },
+                                    { id: 'gemini', label: 'Google Gemini (3.5)', desc: '레벨테스트, 워크시트, 메타인지 질문' },
+                                    { id: 'claude', label: 'Anthropic Claude (4.6/4.8)', desc: '수능 문항 분석, 피드백 생성' },
+                                    { id: 'openai', label: 'OpenAI GPT-5.5', desc: '부모님 피드백, 학습 추천' },
                                 ].map((provider) => (
                                     <div key={provider.id} className="space-y-1">
                                         <div className="flex items-center justify-between">

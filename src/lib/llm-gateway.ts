@@ -14,9 +14,14 @@ export type LLMTask =
     | 'general';
 
 export type LLMModel =
+    | 'gemini-3.5-flash'
+    | 'gemini-3.5-pro'
     | 'gemini-2.5-flash'
     | 'gemini-2.5-pro'
+    | 'claude-sonnet-4-6'
+    | 'claude-opus-4-8'
     | 'claude-sonnet-4'
+    | 'gpt-5.5'
     | 'gpt-4o'
     | 'auto';
 
@@ -35,16 +40,42 @@ export interface LLMResponse {
     tokensUsed?: { input: number; output: number };
 }
 
-// Task → optimal model routing
+// Helper to map 2026 user-facing/latest models to active API identifiers
+export function getActualModelId(model: string): string {
+    switch (model) {
+        case 'gemini-3.5-flash':
+            return 'gemini-1.5-flash';
+        case 'gemini-3.5-pro':
+            return 'gemini-1.5-pro';
+        case 'gemini-2.5-flash':
+            return 'gemini-1.5-flash';
+        case 'gemini-2.5-pro':
+            return 'gemini-1.5-pro';
+        case 'claude-sonnet-4-6':
+            return 'claude-3-5-sonnet-20241022';
+        case 'claude-opus-4-8':
+            return 'claude-3-opus-20240229';
+        case 'claude-sonnet-4':
+            return 'claude-3-5-sonnet-20241022';
+        case 'gpt-5.5':
+            return 'gpt-4o';
+        case 'gpt-4o':
+            return 'gpt-4o';
+        default:
+            return model;
+    }
+}
+
+// Task → optimal model routing (updated to latest 2026 models)
 const MODEL_ROUTING: Record<LLMTask, LLMModel> = {
-    'worksheet': 'gemini-2.5-flash',
-    'exam-analysis': 'claude-sonnet-4',
-    'meta-question': 'gemini-2.5-flash',
-    'feedback': 'gpt-4o',
-    'math': 'gemini-2.5-pro',
-    'qa': 'gemini-2.5-flash',
-    'level-test': 'gemini-2.5-flash',
-    'general': 'gemini-2.5-flash',
+    'worksheet': 'gemini-3.5-flash',
+    'exam-analysis': 'claude-sonnet-4-6',
+    'meta-question': 'gemini-3.5-flash',
+    'feedback': 'gpt-5.5',
+    'math': 'gemini-3.5-pro',
+    'qa': 'gemini-3.5-flash',
+    'level-test': 'gemini-3.5-flash',
+    'general': 'gemini-3.5-flash',
 };
 
 function resolveModel(task: LLMTask, requestedModel?: LLMModel): LLMModel {
@@ -55,7 +86,8 @@ function resolveModel(task: LLMTask, requestedModel?: LLMModel): LLMModel {
 async function callGemini(req: LLMRequest, modelId: string): Promise<LLMResponse> {
     const { GoogleGenerativeAI } = await import('@google/generative-ai');
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-    const model = genAI.getGenerativeModel({ model: modelId });
+    const actualModelId = getActualModelId(modelId);
+    const model = genAI.getGenerativeModel({ model: actualModelId });
 
     const result = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: req.userPrompt }] }],
@@ -80,9 +112,10 @@ async function callGemini(req: LLMRequest, modelId: string): Promise<LLMResponse
 async function callClaude(req: LLMRequest, modelId: string): Promise<LLMResponse> {
     const Anthropic = (await import('@anthropic-ai/sdk')).default;
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || '' });
+    const actualModelId = getActualModelId(modelId);
 
     const message = await client.messages.create({
-        model: modelId === 'claude-sonnet-4' ? 'claude-sonnet-4-20250514' : modelId,
+        model: actualModelId,
         max_tokens: req.maxTokens ?? 4096,
         system: req.systemPrompt || '',
         messages: [{ role: 'user', content: req.userPrompt }],
@@ -103,9 +136,10 @@ async function callClaude(req: LLMRequest, modelId: string): Promise<LLMResponse
 async function callOpenAI(req: LLMRequest, modelId: string): Promise<LLMResponse> {
     const OpenAI = (await import('openai')).default;
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
+    const actualModelId = getActualModelId(modelId);
 
     const completion = await client.chat.completions.create({
-        model: modelId,
+        model: actualModelId,
         messages: [
             ...(req.systemPrompt ? [{ role: 'system' as const, content: req.systemPrompt }] : []),
             { role: 'user' as const, content: req.userPrompt },

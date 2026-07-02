@@ -48,7 +48,7 @@ export function ExamAnalysisModule({ onBack }: { onBack: () => void }) {
                 <div className="mx-auto flex h-14 max-w-4xl items-center gap-4 px-6">
                     <Button variant="ghost" size="icon" onClick={onBack}><ArrowLeft className="h-4 w-4" /></Button>
                     <h1 className="flex-1 text-lg font-bold">📝 수능 문항 분석</h1>
-                    <Badge variant="secondary" className="bg-violet-500/10 text-violet-500">Claude Sonnet</Badge>
+                    <Badge variant="secondary" className="bg-violet-500/10 text-violet-500">Claude Sonnet 4.6</Badge>
                 </div>
             </header>
 

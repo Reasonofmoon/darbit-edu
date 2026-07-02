@@ -70,7 +70,7 @@ export function WorksheetModule({ onBack }: { onBack: () => void }) {
                 <div className="mx-auto flex h-14 max-w-4xl items-center gap-4 px-6">
                     <Button variant="ghost" size="icon" onClick={onBack}><ArrowLeft className="h-4 w-4" /></Button>
                     <h1 className="flex-1 text-lg font-bold">📄 워크시트 생성</h1>
-                    <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-500">Gemini Flash</Badge>
+                    <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-500">Gemini 3.5 Flash</Badge>
                 </div>
             </header>
 
